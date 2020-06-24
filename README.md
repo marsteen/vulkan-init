@@ -7,12 +7,19 @@ Test project for Vulkan applications
 1. Set the path to the Vulkan SDK in the makefile
 
 * Windows (MinGW): make -f makefile-mingw
+* Linux: make -f makefile-linux
 
 ### Prerequisites
 
 Software used for development
 * g++ build tools
-* Vulkan SDK: https://vulkan.lunarg.com/sdk/home 
+* Vulkan SDK: https://vulkan.lunarg.com/sdk/home
+
+Windows (mingw64) packages:
+*
+
+Linux packages:
+* libglfw3-dev
 
 ### Coding style
 
