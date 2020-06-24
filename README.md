@@ -4,6 +4,8 @@ Test project for Vulkan applications
 
 ## Building the triangle example:
 
+1. Set the path to the Vulkan SDK in the makefile
+
 * Windows (MinGW): make -f makefile-mingw
 
 ### Prerequisites

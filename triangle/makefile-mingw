@@ -29,7 +29,7 @@ FRAG_SHADERS = shaders/shader-frag.frag
 CFILES = 
 
 #
-CCFLAGS = -O2 -std=gnu++17 -I./source
+CCFLAGS = -O2 -std=gnu++17 -I./source -I$(VULKAN_SDK)/include
 #
 TARGET   = bin/windows/vulkan-triangle
 #
@@ -57,7 +57,7 @@ VERT_OBJECTS = $(VERT_SHADERS:.vert=.spv)
 FRAG_OBJECTS = $(FRAG_SHADERS:.frag=.spv)
 OBJECTS = $(OBJECTS1) $(OBJECTS2) $(VERT_OBJECTS) $(FRAG_OBJECTS)
 #
-LDFLAGS = -L/c/VulkanSDK/1.2.141.2/Lib -lvulkan-1 -lglfw3
+LDFLAGS = -L$(VULKAN_SDK)/Lib -lvulkan-1 -lglfw3
 #
 $(TARGET) : $(OBJECTS)
 	$(C++) -s -o $(TARGET) $(OBJECTS1) $(OBJECTS2) $(LDFLAGS)
