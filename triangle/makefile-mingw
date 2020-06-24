@@ -1,0 +1,67 @@
+#**********************************************************************
+#
+# Standard makefile
+#
+# written 2013 by Martin Steen
+#
+#**********************************************************************
+#
+# C++ : Name of C++ Compiler
+#
+VK_BIN=/c/VulkanSDK/1.2.141.2/Bin
+C++       = g++
+GLSLC     = $(VK_BIN)/glslc
+#
+#
+#
+
+#
+#
+#
+.SUFFIXES : .cpp .o .vert .frag .spv
+#
+#
+#
+CPPFILES = source/main.cpp \
+           source/CVulkanApp.cpp
+
+VERT_SHADERS = shaders/shader-vert.vert
+FRAG_SHADERS = shaders/shader-frag.frag
+
+CFILES = 
+
+#
+CCFLAGS = -O2 -std=gnu++17 -I./source
+#
+TARGET   = bin/windows/vulkan-triangle
+#
+default : $(TARGET)
+#
+clean:
+	rm -f $(OBJECTS)
+#
+#
+.cpp.o:
+	$(C++) -c $(CCFLAGS) -o$@ $<
+
+.c.o:
+	gcc -c $(CCFLAGS) -o$@ $<
+
+.vert.spv:
+	$(GLSLC) -o$@ $<
+    
+.frag.spv:
+	$(GLSLC) -o$@ $<
+#
+OBJECTS1 = $(CPPFILES:.cpp=.o)
+OBJECTS2 = $(CFILES:.c=.o)
+VERT_OBJECTS = $(VERT_SHADERS:.vert=.spv)
+FRAG_OBJECTS = $(FRAG_SHADERS:.frag=.spv)
+OBJECTS = $(OBJECTS1) $(OBJECTS2) $(VERT_OBJECTS) $(FRAG_OBJECTS)
+#
+LDFLAGS = -L/c/VulkanSDK/1.2.141.2/Lib -lvulkan-1 -lglfw3
+#
+$(TARGET) : $(OBJECTS)
+	$(C++) -s -o $(TARGET) $(OBJECTS1) $(OBJECTS2) $(LDFLAGS)
+	cp ./shaders/*.spv ./bin/windows/shaders
+
