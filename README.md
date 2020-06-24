@@ -16,3 +16,8 @@ Software used for development
 
 * C++ Allman/BSD Style
 * 4 spaces, no tabs.
+
+## Resources
+
+* Vulkan Tutorial: https://vulkan-tutorial.com
+* Tiny object loader: https://github.com/tinyobjloader/tinyobjloader

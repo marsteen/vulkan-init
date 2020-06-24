@@ -1,19 +1,17 @@
 #**********************************************************************
 #
-# Standard makefile
-#
-# written 2013 by Martin Steen
+# Vulkan testproject makefile
 #
 #**********************************************************************
 #
-# C++ : Name of C++ Compiler
-#
-VK_BIN=/c/VulkanSDK/1.2.141.2/Bin
-C++       = g++
-GLSLC     = $(VK_BIN)/glslc
-#
-#
-#
+# Set the path to the Vulkan SDK here:
+
+VULKAN_SDK = /c/VulkanSDK/1.2.141.2
+
+#**********************************************************************
+
+C++        = g++
+GLSLC      = $(VULKAN_SDK)/bin/glslc
 
 #
 #
