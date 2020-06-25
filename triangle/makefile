@@ -54,8 +54,9 @@ GLSLC       = glslc
 FRAMEWORKS  = -framework IOKit \
              -framework Foundation \
              -framework Cocoa -framework CoreAudio -framework Carbon -framework AudioUnit
-CCFLAGS     = -O2 -std=gnu++17
-LDFLAGS = $(FRAMEWORKS) -L$(GLFW_PATH)/lib-macos -lvulkan -lglfw3
+GLFW_PATH   = ../lib-extern/macos/glfw3
+CCFLAGS     = -O2 -std=gnu++17 -I./source -I$(GLFW_PATH)/include
+LDFLAGS     = $(FRAMEWORKS) -L$(GLFW_PATH)/lib-macos -lvulkan -lglfw3
 
 endif
 
@@ -81,7 +82,7 @@ FRAG_SHADERS = shaders/shader-frag.frag
 #
 TARGET   = bin/$(TARGET_OS)/vulkan-triangle
 #
-default : $(TARGET)
+default: $(TARGET)
 #
 clean:
 	rm -f $(OBJECTS)
@@ -107,6 +108,6 @@ OBJECTS = $(OBJECTS1) $(OBJECTS2) $(VERT_OBJECTS) $(FRAG_OBJECTS)
 #
 #
 $(TARGET) : $(OBJECTS)
-	$(C++) -s -o $(TARGET) $(OBJECTS1) $(OBJECTS2) $(LDFLAGS)
+	$(C++) -o $(TARGET) $(OBJECTS1) $(OBJECTS2) $(LDFLAGS)
 	cp ./shaders/*.spv ./bin/$(TARGET_OS)/shaders
 
