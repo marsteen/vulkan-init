@@ -36,7 +36,7 @@ ifeq ($(OS_SYS),Linux)
 
 TARGET_OS   = linux
 GLSLC       = glslc
-CCFLAGS     = -O2 -std=gnu++17
+CCFLAGS     = -O2 -std=gnu++17 -I./source
 LDFLAGS     = -lvulkan -lglfw
 
 endif
