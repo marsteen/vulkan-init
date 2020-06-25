@@ -6,13 +6,9 @@ Test project for Vulkan applications
 
 1. Install Vulkan SDK
 2. Install glfw3 packages (Windows, Linux)
-3. Set the path to the Vulkan SDK in the makefile (Windows, Linux)
+3. Set the path to the Vulkan SDK in the makefile (Windows)
 4. Open console, cd to folder "triangle"
-5. Make the project:
-
-* Windows (MinGW): make -f makefile-mingw
-* Linux: make -f makefile-linux
-* MacOS: make -f makefile-macos
+5. Make the project with "make"
 
 ### Prerequisites
 
@@ -20,13 +16,13 @@ Software used for development
 * g++ build tools
 * Vulkan SDK: https://vulkan.lunarg.com/sdk/home
 * GLFW3: https://www.glfw.org/download.html
-* 
 
-Windows (mingw64) packages:
+Windows (mingw64) pacman packages:
 *
 
-Linux packages:
+Linux apt-get packages:
 * libglfw3-dev
+* lunarg-vulkan-sdk
 
 ### Coding style
 
