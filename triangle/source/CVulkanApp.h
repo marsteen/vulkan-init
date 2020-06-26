@@ -18,73 +18,75 @@ const uint32_t HEIGHT = 600;
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
 #if 1
-struct QueueFamilyIndices 
+struct QueueFamilyIndices
 {
     std::optional<uint32_t> graphicsFamily;
     std::optional<uint32_t> presentFamily;
 
-    bool isComplete() {
+    bool isComplete()
+    {
         return graphicsFamily.has_value() && presentFamily.has_value();
     }
 };
 
-struct SwapChainSupportDetails {
+struct SwapChainSupportDetails
+{
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
 };
 #endif
 
-class CVulkanApp 
+class CVulkanApp
 {
     public:
-    
-        void run() 
+
+        void run()
         {
             initWindow();
             initVulkan();
             mainLoop();
-            cleanup();            
+            cleanup();
         }
-        
+
     protected:
-    
+
        virtual void drawFrame();
-        
+
 
     private:
-        GLFWwindow* window;
+        GLFWwindow* m_window;
 
-        VkInstance instance;
-        VkDebugUtilsMessengerEXT debugMessenger;
-        VkSurfaceKHR surface;
+        VkInstance m_instance;
+        VkDebugUtilsMessengerEXT m_debugMessenger;
+        VkSurfaceKHR m_surface;
 
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-        VkDevice device;
+        VkDevice m_device;
 
-        VkQueue graphicsQueue;
-        VkQueue presentQueue;
+        VkQueue m_graphicsQueue;
+        VkQueue m_presentQueue;
 
-        VkSwapchainKHR swapChain;
-        std::vector<VkImage> swapChainImages;
-        VkFormat swapChainImageFormat;
-        VkExtent2D swapChainExtent;
-        std::vector<VkImageView> swapChainImageViews;
-        std::vector<VkFramebuffer> swapChainFramebuffers;
+        VkSwapchainKHR m_swapChain;
+        std::vector<VkImage> m_swapChainImages;
+        VkFormat m_swapChainImageFormat;
+        VkExtent2D m_swapChainExtent;
+        std::vector<VkImageView> m_swapChainImageViews;
+        std::vector<VkFramebuffer> m_swapChainFramebuffers;
 
-        VkRenderPass renderPass;
-        VkPipelineLayout pipelineLayout;
-        VkPipeline graphicsPipeline;
+        VkRenderPass m_renderPass;
+        VkPipelineLayout m_pipelineLayout;
+        VkPipeline m_graphicsPipeline;
 
-        VkCommandPool commandPool;
-        std::vector<VkCommandBuffer> commandBuffers;
+        VkCommandPool m_commandPool;
+        std::vector<VkCommandBuffer> m_commandBuffers;
 
-        std::vector<VkSemaphore> imageAvailableSemaphores;
-        std::vector<VkSemaphore> renderFinishedSemaphores;
-        std::vector<VkFence> inFlightFences;
-        std::vector<VkFence> imagesInFlight;
-        size_t currentFrame = 0;
-    
+        std::vector<VkSemaphore> m_imageAvailableSemaphores;
+        std::vector<VkSemaphore> m_renderFinishedSemaphores;
+        std::vector<VkFence> m_inFlightFences;
+        std::vector<VkFence> m_imagesInFlight;
+        size_t m_currentFrame = 0;
+
         void initWindow();
         void initVulkan();
         void cleanup();
@@ -103,10 +105,10 @@ class CVulkanApp
         void createCommandBuffers();
         void createSyncObjects();
         void mainLoop();
-        
+
         VkShaderModule createShaderModule(const std::vector<char>& code) const;
         static VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-        
+
         static VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
         static VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
         SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) const;
@@ -117,7 +119,7 @@ class CVulkanApp
         static bool checkValidationLayerSupport();
         static std::vector<char> readFile(const std::string& filename);
         static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
-    
+
 
 };
 

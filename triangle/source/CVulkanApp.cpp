@@ -27,38 +27,59 @@
 #include <set>
 #include <CVulkanApp.h>
 
-
 //---------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------
 
-static const std::vector<const char*> validationLayers = {
+static const std::vector<const char*> validationLayers =
+{
     "VK_LAYER_KHRONOS_validation"
 };
 
-static const std::vector<const char*> deviceExtensions = {
+static const std::vector<const char*> deviceExtensions =
+{
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
 #ifdef NDEBUG
-static const bool enableValidationLayers = false;
+static const bool StaticEnableValidationLayers = false;
 #else
-static const bool enableValidationLayers = true;
+static const bool StaticEnableValidationLayers = true;
 #endif
 
-static VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-        return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-    } else {
+//---------------------------------------------------------------------------
+//
+// Klasse:    static
+// Methode:   CreateDebugUtilsMessengerEXT
+//
+//---------------------------------------------------------------------------
+
+static VkResult CreateDebugUtilsMessengerEXT(VkInstance m_instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
+{
+    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(m_instance, "vkCreateDebugUtilsMessengerEXT");
+    if (func != nullptr)
+    {
+        return func(m_instance, pCreateInfo, pAllocator, pDebugMessenger);
+    }
+    else
+    {
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 }
 
-static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-        func(instance, debugMessenger, pAllocator);
+//---------------------------------------------------------------------------
+//
+// Klasse:    static
+// Methode:   DestroyDebugUtilsMessengerEXT
+//
+//---------------------------------------------------------------------------
+
+static void DestroyDebugUtilsMessengerEXT(VkInstance m_instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
+{
+    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
+    if (func != nullptr)
+    {
+        func(m_instance, debugMessenger, pAllocator);
     }
 }
 
@@ -67,16 +88,16 @@ static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMesse
 // Klasse:    CVulkanApp
 // Methode:   initWindow
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::initWindow() 
+void CVulkanApp::initWindow()
 {
     glfwInit();
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-    window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+    m_window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -84,9 +105,9 @@ void CVulkanApp::initWindow()
 // Klasse:    CVulkanApp
 // Methode:   initVulkan
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::initVulkan() 
+void CVulkanApp::initVulkan()
 {
     createInstance();
     setupDebugMessenger();
@@ -108,16 +129,16 @@ void CVulkanApp::initVulkan()
 // Klasse:    CVulkanApp
 // Methode:   mainLoop
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::mainLoop() 
+void CVulkanApp::mainLoop()
 {
-    while (!glfwWindowShouldClose(window)) 
+    while (!glfwWindowShouldClose(m_window))
     {
         glfwPollEvents();
         drawFrame();
     }
-    vkDeviceWaitIdle(device);
+    vkDeviceWaitIdle(m_device);
 }
 
 //---------------------------------------------------------------------------
@@ -125,45 +146,45 @@ void CVulkanApp::mainLoop()
 // Klasse:    CVulkanApp
 // Methode:   cleanup
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::cleanup() 
+void CVulkanApp::cleanup()
 {
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
-        vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
-        vkDestroyFence(device, inFlightFences[i], nullptr);
+        vkDestroySemaphore(m_device, m_renderFinishedSemaphores[i], nullptr);
+        vkDestroySemaphore(m_device, m_imageAvailableSemaphores[i], nullptr);
+        vkDestroyFence(m_device, m_inFlightFences[i], nullptr);
     }
 
-    vkDestroyCommandPool(device, commandPool, nullptr);
+    vkDestroyCommandPool(m_device, m_commandPool, nullptr);
 
-    for (auto framebuffer : swapChainFramebuffers) 
+    for (auto framebuffer : m_swapChainFramebuffers)
     {
-        vkDestroyFramebuffer(device, framebuffer, nullptr);
+        vkDestroyFramebuffer(m_device, framebuffer, nullptr);
     }
 
-    vkDestroyPipeline(device, graphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-    vkDestroyRenderPass(device, renderPass, nullptr);
+    vkDestroyPipeline(m_device, m_graphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
+    vkDestroyRenderPass(m_device, m_renderPass, nullptr);
 
-    for (auto imageView : swapChainImageViews) 
+    for (auto imageView : m_swapChainImageViews)
     {
-        vkDestroyImageView(device, imageView, nullptr);
+        vkDestroyImageView(m_device, imageView, nullptr);
     }
 
-    vkDestroySwapchainKHR(device, swapChain, nullptr);
-    vkDestroyDevice(device, nullptr);
+    vkDestroySwapchainKHR(m_device, m_swapChain, nullptr);
+    vkDestroyDevice(m_device, nullptr);
 
-    if (enableValidationLayers) 
+    if (StaticEnableValidationLayers)
     {
-        DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+        DestroyDebugUtilsMessengerEXT(m_instance, m_debugMessenger, nullptr);
     }
 
-    vkDestroySurfaceKHR(instance, surface, nullptr);
-    vkDestroyInstance(instance, nullptr);
+    vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+    vkDestroyInstance(m_instance, nullptr);
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(m_window);
 
     glfwTerminate();
 }
@@ -173,11 +194,11 @@ void CVulkanApp::cleanup()
 // Klasse:    CVulkanApp
 // Methode:   createInstance
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::createInstance() 
+void CVulkanApp::createInstance()
 {
-    if (enableValidationLayers && !checkValidationLayerSupport()) 
+    if (StaticEnableValidationLayers && !checkValidationLayerSupport())
     {
         throw std::runtime_error("validation layers requested, but not available!");
     }
@@ -199,23 +220,23 @@ void CVulkanApp::createInstance()
     createInfo.ppEnabledExtensionNames = extensions.data();
 
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
-    if (enableValidationLayers) 
+    if (StaticEnableValidationLayers)
     {
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
 
         populateDebugMessengerCreateInfo(debugCreateInfo);
         createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
-    } 
-    else 
+    }
+    else
     {
         createInfo.enabledLayerCount = 0;
         createInfo.pNext = nullptr;
     }
 
-    if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) 
+    if (vkCreateInstance(&createInfo, nullptr, &m_instance) != VK_SUCCESS)
     {
-        throw std::runtime_error("failed to create instance!");
+        throw std::runtime_error("failed to create m_instance!");
     }
 }
 
@@ -224,9 +245,9 @@ void CVulkanApp::createInstance()
 // Klasse:    CVulkanApp
 // Methode:   populateDebugMessengerCreateInfo
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) 
+void CVulkanApp::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
 {
     createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -240,18 +261,19 @@ void CVulkanApp::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInf
 // Klasse:    CVulkanApp
 // Methode:   setupDebugMessenger
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::setupDebugMessenger() 
+void CVulkanApp::setupDebugMessenger()
 {
-    if (!enableValidationLayers) return;
-
-    VkDebugUtilsMessengerCreateInfoEXT createInfo;
-    populateDebugMessengerCreateInfo(createInfo);
-
-    if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) 
+    if (StaticEnableValidationLayers)
     {
-        throw std::runtime_error("failed to set up debug messenger!");
+        VkDebugUtilsMessengerCreateInfoEXT createInfo;
+        populateDebugMessengerCreateInfo(createInfo);
+
+        if (CreateDebugUtilsMessengerEXT(m_instance, &createInfo, nullptr, &m_debugMessenger) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to set up debug messenger!");
+        }
     }
 }
 
@@ -260,11 +282,11 @@ void CVulkanApp::setupDebugMessenger()
 // Klasse:    CVulkanApp
 // Methode:   createSurface
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::createSurface() 
+void CVulkanApp::createSurface()
 {
-    if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) 
+    if (glfwCreateWindowSurface(m_instance, m_window, nullptr, &m_surface) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create window surface!");
     }
@@ -275,31 +297,31 @@ void CVulkanApp::createSurface()
 // Klasse:    CVulkanApp
 // Methode:   pickPhysicalDevice
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::pickPhysicalDevice() 
+void CVulkanApp::pickPhysicalDevice()
 {
     uint32_t deviceCount = 0;
-    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+    vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
 
-    if (deviceCount == 0) 
+    if (deviceCount == 0)
     {
         throw std::runtime_error("failed to find GPUs with Vulkan support!");
     }
 
     std::vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+    vkEnumeratePhysicalDevices(m_instance, &deviceCount, devices.data());
 
-    for (const auto& device : devices) 
+    for (const auto& device : devices)
     {
-        if (isDeviceSuitable(device)) 
+        if (isDeviceSuitable(device))
         {
             physicalDevice = device;
             break;
         }
     }
 
-    if (physicalDevice == VK_NULL_HANDLE) 
+    if (physicalDevice == VK_NULL_HANDLE)
     {
         throw std::runtime_error("failed to find a suitable GPU!");
     }
@@ -310,9 +332,9 @@ void CVulkanApp::pickPhysicalDevice()
 // Klasse:    CVulkanApp
 // Methode:   createLogicalDevice
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::createLogicalDevice() 
+void CVulkanApp::createLogicalDevice()
 {
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
@@ -320,7 +342,7 @@ void CVulkanApp::createLogicalDevice()
     std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
     float queuePriority = 1.0f;
-    for (uint32_t queueFamily : uniqueQueueFamilies) 
+    for (uint32_t queueFamily : uniqueQueueFamilies)
     {
         VkDeviceQueueCreateInfo queueCreateInfo{};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -343,23 +365,23 @@ void CVulkanApp::createLogicalDevice()
     createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
     createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-    if (enableValidationLayers) 
+    if (StaticEnableValidationLayers)
     {
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
-    } 
-    else 
+    }
+    else
     {
         createInfo.enabledLayerCount = 0;
     }
 
-    if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS) 
+    if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &m_device) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create logical device!");
     }
 
-    vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
-    vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
+    vkGetDeviceQueue(m_device, indices.graphicsFamily.value(), 0, &m_graphicsQueue);
+    vkGetDeviceQueue(m_device, indices.presentFamily.value(), 0, &m_presentQueue);
 }
 
 //---------------------------------------------------------------------------
@@ -367,9 +389,9 @@ void CVulkanApp::createLogicalDevice()
 // Klasse:    CVulkanApp
 // Methode:   createSwapChain
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::createSwapChain() 
+void CVulkanApp::createSwapChain()
 {
     SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
 
@@ -378,14 +400,14 @@ void CVulkanApp::createSwapChain()
     VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
 
     uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
-    if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) 
+    if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount)
     {
         imageCount = swapChainSupport.capabilities.maxImageCount;
     }
 
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = surface;
+    createInfo.surface = m_surface;
 
     createInfo.minImageCount = imageCount;
     createInfo.imageFormat = surfaceFormat.format;
@@ -397,13 +419,13 @@ void CVulkanApp::createSwapChain()
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
     uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
-    if (indices.graphicsFamily != indices.presentFamily) 
+    if (indices.graphicsFamily != indices.presentFamily)
     {
         createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         createInfo.queueFamilyIndexCount = 2;
         createInfo.pQueueFamilyIndices = queueFamilyIndices;
-    } 
-    else 
+    }
+    else
     {
         createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     }
@@ -415,17 +437,17 @@ void CVulkanApp::createSwapChain()
 
     createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-    if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) != VK_SUCCESS) 
+    if (vkCreateSwapchainKHR(m_device, &createInfo, nullptr, &m_swapChain) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create swap chain!");
     }
 
-    vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
-    swapChainImages.resize(imageCount);
-    vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages.data());
+    vkGetSwapchainImagesKHR(m_device, m_swapChain, &imageCount, nullptr);
+    m_swapChainImages.resize(imageCount);
+    vkGetSwapchainImagesKHR(m_device, m_swapChain, &imageCount, m_swapChainImages.data());
 
-    swapChainImageFormat = surfaceFormat.format;
-    swapChainExtent = extent;
+    m_swapChainImageFormat = surfaceFormat.format;
+    m_swapChainExtent = extent;
 }
 
 //---------------------------------------------------------------------------
@@ -433,19 +455,19 @@ void CVulkanApp::createSwapChain()
 // Klasse:    CVulkanApp
 // Methode:   createImageViews
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::createImageViews() 
+void CVulkanApp::createImageViews()
 {
-    swapChainImageViews.resize(swapChainImages.size());
+    m_swapChainImageViews.resize(m_swapChainImages.size());
 
-    for (size_t i = 0; i < swapChainImages.size(); i++) 
+    for (size_t i = 0; i < m_swapChainImages.size(); i++)
     {
         VkImageViewCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        createInfo.image = swapChainImages[i];
+        createInfo.image = m_swapChainImages[i];
         createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        createInfo.format = swapChainImageFormat;
+        createInfo.format = m_swapChainImageFormat;
         createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
         createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
         createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -456,7 +478,7 @@ void CVulkanApp::createImageViews()
         createInfo.subresourceRange.baseArrayLayer = 0;
         createInfo.subresourceRange.layerCount = 1;
 
-        if (vkCreateImageView(device, &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS) 
+        if (vkCreateImageView(m_device, &createInfo, nullptr, &m_swapChainImageViews[i]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create image views!");
         }
@@ -468,12 +490,12 @@ void CVulkanApp::createImageViews()
 // Klasse:    CVulkanApp
 // Methode:   createRenderPass
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::createRenderPass() 
+void CVulkanApp::createRenderPass()
 {
     VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = swapChainImageFormat;
+    colorAttachment.format = m_swapChainImageFormat;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -508,7 +530,8 @@ void CVulkanApp::createRenderPass()
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &m_renderPass) != VK_SUCCESS)
+    {
         throw std::runtime_error("failed to create render pass!");
     }
 }
@@ -518,9 +541,9 @@ void CVulkanApp::createRenderPass()
 // Klasse:    CVulkanApp
 // Methode:   createGraphicsPipeline
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::createGraphicsPipeline() 
+void CVulkanApp::createGraphicsPipeline()
 {
     auto vertShaderCode = readFile("shaders/shader-vert.spv");
     auto fragShaderCode = readFile("shaders/shader-frag.spv");
@@ -555,14 +578,14 @@ void CVulkanApp::createGraphicsPipeline()
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float) swapChainExtent.width;
-    viewport.height = (float) swapChainExtent.height;
+    viewport.width = (float) m_swapChainExtent.width;
+    viewport.height = (float) m_swapChainExtent.height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor{};
     scissor.offset = {0, 0};
-    scissor.extent = swapChainExtent;
+    scissor.extent = m_swapChainExtent;
 
     VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -606,7 +629,7 @@ void CVulkanApp::createGraphicsPipeline()
     pipelineLayoutInfo.setLayoutCount = 0;
     pipelineLayoutInfo.pushConstantRangeCount = 0;
 
-    if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) 
+    if (vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create pipeline layout!");
     }
@@ -621,18 +644,18 @@ void CVulkanApp::createGraphicsPipeline()
     pipelineInfo.pRasterizationState = &rasterizer;
     pipelineInfo.pMultisampleState = &multisampling;
     pipelineInfo.pColorBlendState = &colorBlending;
-    pipelineInfo.layout = pipelineLayout;
-    pipelineInfo.renderPass = renderPass;
+    pipelineInfo.layout = m_pipelineLayout;
+    pipelineInfo.renderPass = m_renderPass;
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-    if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) 
+    if (vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_graphicsPipeline) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create graphics pipeline!");
     }
 
-    vkDestroyShaderModule(device, fragShaderModule, nullptr);
-    vkDestroyShaderModule(device, vertShaderModule, nullptr);
+    vkDestroyShaderModule(m_device, fragShaderModule, nullptr);
+    vkDestroyShaderModule(m_device, vertShaderModule, nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -640,29 +663,29 @@ void CVulkanApp::createGraphicsPipeline()
 // Klasse:    CVulkanApp
 // Methode:   createFramebuffers
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::createFramebuffers() 
+void CVulkanApp::createFramebuffers()
 {
-    swapChainFramebuffers.resize(swapChainImageViews.size());
+    m_swapChainFramebuffers.resize(m_swapChainImageViews.size());
 
-    for (size_t i = 0; i < swapChainImageViews.size(); i++) 
+    for (size_t i = 0; i < m_swapChainImageViews.size(); i++)
     {
-        VkImageView attachments[] = 
+        VkImageView attachments[] =
         {
-            swapChainImageViews[i]
+            m_swapChainImageViews[i]
         };
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferInfo.renderPass = renderPass;
+        framebufferInfo.renderPass = m_renderPass;
         framebufferInfo.attachmentCount = 1;
         framebufferInfo.pAttachments = attachments;
-        framebufferInfo.width = swapChainExtent.width;
-        framebufferInfo.height = swapChainExtent.height;
+        framebufferInfo.width = m_swapChainExtent.width;
+        framebufferInfo.height = m_swapChainExtent.height;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) 
+        if (vkCreateFramebuffer(m_device, &framebufferInfo, nullptr, &m_swapChainFramebuffers[i]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create framebuffer!");
         }
@@ -674,9 +697,9 @@ void CVulkanApp::createFramebuffers()
 // Klasse:    CVulkanApp
 // Methode:   createCommandPool
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::createCommandPool() 
+void CVulkanApp::createCommandPool()
 {
     QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
 
@@ -684,7 +707,7 @@ void CVulkanApp::createCommandPool()
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
 
-    if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) 
+    if (vkCreateCommandPool(m_device, &poolInfo, nullptr, &m_commandPool) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create command pool!");
     }
@@ -695,53 +718,53 @@ void CVulkanApp::createCommandPool()
 // Klasse:    CVulkanApp
 // Methode:   createCommandBuffers
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::createCommandBuffers() 
+void CVulkanApp::createCommandBuffers()
 {
-    commandBuffers.resize(swapChainFramebuffers.size());
+    m_commandBuffers.resize(m_swapChainFramebuffers.size());
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = commandPool;
+    allocInfo.commandPool = m_commandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = (uint32_t) commandBuffers.size();
+    allocInfo.commandBufferCount = (uint32_t) m_commandBuffers.size();
 
-    if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) 
+    if (vkAllocateCommandBuffers(m_device, &allocInfo, m_commandBuffers.data()) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 
-    for (size_t i = 0; i < commandBuffers.size(); i++) 
+    for (size_t i = 0; i < m_commandBuffers.size(); i++)
     {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) 
+        if (vkBeginCommandBuffer(m_commandBuffers[i], &beginInfo) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to begin recording command buffer!");
         }
 
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = renderPass;
-        renderPassInfo.framebuffer = swapChainFramebuffers[i];
+        renderPassInfo.renderPass = m_renderPass;
+        renderPassInfo.framebuffer = m_swapChainFramebuffers[i];
         renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = swapChainExtent;
+        renderPassInfo.renderArea.extent = m_swapChainExtent;
 
         VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &clearColor;
 
-        vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBeginRenderPass(m_commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-        vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+        vkCmdBindPipeline(m_commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphicsPipeline);
 
-        vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+        vkCmdDraw(m_commandBuffers[i], 3, 1, 0, 0);
 
-        vkCmdEndRenderPass(commandBuffers[i]);
+        vkCmdEndRenderPass(m_commandBuffers[i]);
 
-        if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) 
+        if (vkEndCommandBuffer(m_commandBuffers[i]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to record command buffer!");
         }
@@ -753,14 +776,14 @@ void CVulkanApp::createCommandBuffers()
 // Klasse:    CVulkanApp
 // Methode:   createSyncObjects
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::createSyncObjects() 
+void CVulkanApp::createSyncObjects()
 {
-    imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-    renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-    inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
-    imagesInFlight.resize(swapChainImages.size(), VK_NULL_HANDLE);
+    m_imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    m_renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    m_inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+    m_imagesInFlight.resize(m_swapChainImages.size(), VK_NULL_HANDLE);
 
     VkSemaphoreCreateInfo semaphoreInfo{};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -769,11 +792,11 @@ void CVulkanApp::createSyncObjects()
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) 
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
-            vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
-            vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) 
+        if (vkCreateSemaphore(m_device, &semaphoreInfo, nullptr, &m_imageAvailableSemaphores[i]) != VK_SUCCESS ||
+            vkCreateSemaphore(m_device, &semaphoreInfo, nullptr, &m_renderFinishedSemaphores[i]) != VK_SUCCESS ||
+            vkCreateFence(m_device, &fenceInfo, nullptr, &m_inFlightFences[i]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create synchronization objects for a frame!");
         }
@@ -785,40 +808,40 @@ void CVulkanApp::createSyncObjects()
 // Klasse:    CVulkanApp
 // Methode:   drawFrame
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-void CVulkanApp::drawFrame() 
+void CVulkanApp::drawFrame()
 {
-    vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+    vkWaitForFences(m_device, 1, &m_inFlightFences[m_currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
-    vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+    vkAcquireNextImageKHR(m_device, m_swapChain, UINT64_MAX, m_imageAvailableSemaphores[m_currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-    if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) 
+    if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE)
     {
-        vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
+        vkWaitForFences(m_device, 1, &m_imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
     }
-    imagesInFlight[imageIndex] = inFlightFences[currentFrame];
+    m_imagesInFlight[imageIndex] = m_inFlightFences[m_currentFrame];
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[currentFrame]};
-    VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    VkSemaphore waitSemaphores[] = { m_imageAvailableSemaphores[m_currentFrame] };
+    VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
 
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
+    submitInfo.pCommandBuffers = &m_commandBuffers[imageIndex];
 
-    VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[currentFrame]};
+    VkSemaphore signalSemaphores[] = { m_renderFinishedSemaphores[m_currentFrame] };
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    vkResetFences(device, 1, &inFlightFences[currentFrame]);
+    vkResetFences(m_device, 1, &m_inFlightFences[m_currentFrame]);
 
-    if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) 
+    if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_inFlightFences[m_currentFrame]) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
@@ -829,15 +852,15 @@ void CVulkanApp::drawFrame()
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = signalSemaphores;
 
-    VkSwapchainKHR swapChains[] = {swapChain};
+    VkSwapchainKHR swapChains[] = { m_swapChain };
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
 
     presentInfo.pImageIndices = &imageIndex;
 
-    vkQueuePresentKHR(presentQueue, &presentInfo);
+    vkQueuePresentKHR(m_presentQueue, &presentInfo);
 
-    currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    m_currentFrame = (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 //---------------------------------------------------------------------------
@@ -845,7 +868,7 @@ void CVulkanApp::drawFrame()
 // Klasse:    CVulkanApp
 // Methode:   createShaderModule
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
 VkShaderModule CVulkanApp::createShaderModule(const std::vector<char>& code) const
 {
@@ -854,13 +877,13 @@ VkShaderModule CVulkanApp::createShaderModule(const std::vector<char>& code) con
     createInfo.codeSize = code.size();
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-    VkShaderModule shaderModule; 
-    if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) 
+    VkShaderModule shaderModule;
+    if (vkCreateShaderModule(m_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create shader module!");
     }
 
-    return shaderModule; 
+    return shaderModule;
 }
 
 //---------------------------------------------------------------------------
@@ -868,13 +891,13 @@ VkShaderModule CVulkanApp::createShaderModule(const std::vector<char>& code) con
 // Klasse:    CVulkanApp
 // Methode:   chooseSwapSurfaceFormat
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-VkSurfaceFormatKHR CVulkanApp::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) 
+VkSurfaceFormatKHR CVulkanApp::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {
-    for (const auto& availableFormat : availableFormats) 
+    for (const auto& availableFormat : availableFormats)
     {
-        if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) 
+        if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
         {
             return availableFormat;
         }
@@ -888,13 +911,13 @@ VkSurfaceFormatKHR CVulkanApp::chooseSwapSurfaceFormat(const std::vector<VkSurfa
 // Klasse:    CVulkanApp
 // Methode:   chooseSwapPresentMode
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-VkPresentModeKHR CVulkanApp::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) 
+VkPresentModeKHR CVulkanApp::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
 {
-    for (const auto& availablePresentMode : availablePresentModes) 
+    for (const auto& availablePresentMode : availablePresentModes)
     {
-        if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) 
+        if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
         {
             return availablePresentMode;
         }
@@ -908,15 +931,15 @@ VkPresentModeKHR CVulkanApp::chooseSwapPresentMode(const std::vector<VkPresentMo
 // Klasse:    CVulkanApp
 // Methode:   chooseSwapExtent
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-VkExtent2D CVulkanApp::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) 
+VkExtent2D CVulkanApp::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
 {
-    if (capabilities.currentExtent.width != UINT32_MAX) 
+    if (capabilities.currentExtent.width != UINT32_MAX)
     {
         return capabilities.currentExtent;
-    } 
-    else 
+    }
+    else
     {
         VkExtent2D actualExtent = {WIDTH, HEIGHT};
 
@@ -932,30 +955,30 @@ VkExtent2D CVulkanApp::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabili
 // Klasse:    CVulkanApp
 // Methode:   querySwapChainSupport
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
 SwapChainSupportDetails CVulkanApp::querySwapChainSupport(VkPhysicalDevice device) const
 {
     SwapChainSupportDetails details;
 
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, m_surface, &details.capabilities);
 
     uint32_t formatCount;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, nullptr);
 
-    if (formatCount != 0) 
+    if (formatCount != 0)
     {
         details.formats.resize(formatCount);
-        vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
+        vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, details.formats.data());
     }
 
     uint32_t presentModeCount;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, nullptr);
 
-    if (presentModeCount != 0) 
+    if (presentModeCount != 0)
     {
         details.presentModes.resize(presentModeCount);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
+        vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, details.presentModes.data());
     }
 
     return details;
@@ -966,16 +989,16 @@ SwapChainSupportDetails CVulkanApp::querySwapChainSupport(VkPhysicalDevice devic
 // Klasse:    CVulkanApp
 // Methode:   isDeviceSuitable
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-bool CVulkanApp::isDeviceSuitable(VkPhysicalDevice device) const 
+bool CVulkanApp::isDeviceSuitable(VkPhysicalDevice device) const
 {
     QueueFamilyIndices indices = findQueueFamilies(device);
 
     bool extensionsSupported = checkDeviceExtensionSupport(device);
 
     bool swapChainAdequate = false;
-    if (extensionsSupported) 
+    if (extensionsSupported)
     {
         SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
         swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
@@ -989,9 +1012,9 @@ bool CVulkanApp::isDeviceSuitable(VkPhysicalDevice device) const
 // Klasse:    CVulkanApp
 // Methode:   checkDeviceExtensionSupport
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-bool CVulkanApp::checkDeviceExtensionSupport(VkPhysicalDevice device) 
+bool CVulkanApp::checkDeviceExtensionSupport(VkPhysicalDevice device)
 {
     uint32_t extensionCount;
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -1001,7 +1024,7 @@ bool CVulkanApp::checkDeviceExtensionSupport(VkPhysicalDevice device)
 
     std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
-    for (const auto& extension : availableExtensions) 
+    for (const auto& extension : availableExtensions)
     {
         requiredExtensions.erase(extension.extensionName);
     }
@@ -1014,7 +1037,7 @@ bool CVulkanApp::checkDeviceExtensionSupport(VkPhysicalDevice device)
 // Klasse:    CVulkanApp
 // Methode:   findQueueFamilies
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
 QueueFamilyIndices CVulkanApp::findQueueFamilies(VkPhysicalDevice device) const
 {
@@ -1027,22 +1050,22 @@ QueueFamilyIndices CVulkanApp::findQueueFamilies(VkPhysicalDevice device) const
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
     int i = 0;
-    for (const auto& queueFamily : queueFamilies) 
+    for (const auto& queueFamily : queueFamilies)
     {
-        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) 
+        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
         {
             indices.graphicsFamily = i;
         }
 
         VkBool32 presentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface, &presentSupport);
 
-        if (presentSupport) 
+        if (presentSupport)
         {
             indices.presentFamily = i;
         }
 
-        if (indices.isComplete()) 
+        if (indices.isComplete())
         {
             break;
         }
@@ -1058,9 +1081,9 @@ QueueFamilyIndices CVulkanApp::findQueueFamilies(VkPhysicalDevice device) const
 // Klasse:    CVulkanApp
 // Methode:   getRequiredExtensions
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-std::vector<const char*> CVulkanApp::getRequiredExtensions() 
+std::vector<const char*> CVulkanApp::getRequiredExtensions()
 {
     uint32_t glfwExtensionCount = 0;
     const char** glfwExtensions;
@@ -1068,7 +1091,7 @@ std::vector<const char*> CVulkanApp::getRequiredExtensions()
 
     std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
-    if (enableValidationLayers) 
+    if (StaticEnableValidationLayers)
     {
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
@@ -1081,9 +1104,9 @@ std::vector<const char*> CVulkanApp::getRequiredExtensions()
 // Klasse:    CVulkanApp
 // Methode:   checkValidationLayerSupport
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-bool CVulkanApp::checkValidationLayerSupport() 
+bool CVulkanApp::checkValidationLayerSupport()
 {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -1091,20 +1114,20 @@ bool CVulkanApp::checkValidationLayerSupport()
     std::vector<VkLayerProperties> availableLayers(layerCount);
     vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
-    for (const char* layerName : validationLayers) 
+    for (const char* layerName : validationLayers)
     {
         bool layerFound = false;
 
-        for (const auto& layerProperties : availableLayers) 
+        for (const auto& layerProperties : availableLayers)
         {
-            if (strcmp(layerName, layerProperties.layerName) == 0) 
+            if (strcmp(layerName, layerProperties.layerName) == 0)
             {
                 layerFound = true;
                 break;
             }
         }
 
-        if (!layerFound) 
+        if (!layerFound)
         {
             return false;
         }
@@ -1118,13 +1141,13 @@ bool CVulkanApp::checkValidationLayerSupport()
 // Klasse:    CVulkanApp (static)
 // Methode:   readFile
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
-std::vector<char> CVulkanApp::readFile(const std::string& filename) 
+std::vector<char> CVulkanApp::readFile(const std::string& filename)
 {
     std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
-    if (!file.is_open()) 
+    if (!file.is_open())
     {
         throw std::runtime_error("failed to open file!");
     }
@@ -1145,13 +1168,13 @@ std::vector<char> CVulkanApp::readFile(const std::string& filename)
 // Klasse:    CVulkanApp
 // Methode:   debugCallback
 //
-//--------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------
 
 VKAPI_ATTR VkBool32 VKAPI_CALL CVulkanApp::debugCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
-    VkDebugUtilsMessageTypeFlagsEXT messageType, 
-    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, 
-    void* pUserData) 
+    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT messageType,
+    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+    void* pUserData)
 {
     std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
     return VK_FALSE;
