@@ -39,11 +39,13 @@ struct SwapChainSupportDetails
 #endif
 
 
-struct Vertex {
+struct Vertex 
+{
     glm::vec2 pos;
     glm::vec3 color;
 
-    static VkVertexInputBindingDescription getBindingDescription() {
+    static VkVertexInputBindingDescription getBindingDescription() 
+    {
         VkVertexInputBindingDescription bindingDescription{};
         bindingDescription.binding = 0;
         bindingDescription.stride = sizeof(Vertex);
@@ -52,7 +54,8 @@ struct Vertex {
         return bindingDescription;
     }
 
-    static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() {
+    static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() 
+    {
         std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
 
         attributeDescriptions[0].binding = 0;
@@ -68,13 +71,6 @@ struct Vertex {
         return attributeDescriptions;
     }
 };
-
-const std::vector<Vertex> vertices = {
-    {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-    {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
-};
-
 
 
 class CVulkanApp
@@ -93,7 +89,6 @@ class CVulkanApp
 
        virtual void drawFrame();
 
-
     private:
         GLFWwindow* m_window;
 
@@ -101,7 +96,7 @@ class CVulkanApp
         VkDebugUtilsMessengerEXT m_debugMessenger;
         VkSurfaceKHR m_surface;
 
-        VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+        VkPhysicalDevice m_physicalDevice = VK_NULL_HANDLE;
         VkDevice m_device;
 
         VkQueue m_graphicsQueue;
@@ -124,7 +119,6 @@ class CVulkanApp
         VkBuffer m_vertexBuffer;
         VkDeviceMemory m_vertexBufferMemory;
 
-
         std::vector<VkSemaphore> m_imageAvailableSemaphores;
         std::vector<VkSemaphore> m_renderFinishedSemaphores;
         std::vector<VkFence> m_inFlightFences;
@@ -146,11 +140,17 @@ class CVulkanApp
         void createRenderPass();
         void createGraphicsPipeline();
         void createFramebuffers();
-        void createCommandPool();
-        void createVertexBuffer();
+        void createCommandPool();        
+        static void createVertexBuffer(
+            VkDevice& device, 
+            VkPhysicalDevice& physicalDevice,
+            VkBuffer& vertexBuffer, 
+            VkDeviceMemory& vertexBufferMemory, 
+            const std::vector<Vertex>& localVertices);
+
         void createCommandBuffers();
         void createSyncObjects();
-        uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+        static uint32_t findMemoryType(VkPhysicalDevice& localPhysicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
         void mainLoop();
 
         VkShaderModule createShaderModule(const std::vector<char>& code) const;
