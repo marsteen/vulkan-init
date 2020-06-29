@@ -18,7 +18,7 @@ Software used for development
 * GLFW3: https://www.glfw.org/download.html
 
 Windows (mingw64) pacman packages:
-*
+* mingw-w64-x86_64-glfw
 
 Linux apt-get packages:
 * libglfw3-dev
