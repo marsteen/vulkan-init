@@ -16,6 +16,7 @@ Software used for development
 * g++ build tools
 * Vulkan SDK: https://vulkan.lunarg.com/sdk/home
 * GLFW3: https://www.glfw.org/download.html
+* Vulkan Tutorial: https://vulkan-tutorial.com/
 
 Windows (mingw64) pacman packages:
 * mingw-w64-x86_64-glfw
