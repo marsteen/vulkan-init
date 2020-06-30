@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <optional>
 #include <set>
+#include <array>
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
