@@ -3,9 +3,12 @@ project("vktriangle")
 
 message("System: ${CMAKE_SYSTEM_NAME}")
 
-include_directories(./source)
 
+
+SET(VULKAN_SDK_WINDOWS "/opt/VulkanSDK/1.2.148.1")
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++17")
+
+
 
 #
 # GLFW
@@ -16,25 +19,32 @@ if (GLFW3_FOUND)
     include_directories($(GLFW3_INCLUDE_DIRS))    
 endif()
 
-
+include_directories(./source)
+if (CMAKE_SYSTEM_NAME STREQUAL "MSYS")
+    include_directories(./source ${VULKAN_SDK_WINDOWS}/include)
+    link_directories(${VULKAN_SDK_WINDOWS}/Lib)
+endif()
 
 add_executable(vktriangle
     ../source/main.cpp
     ../source/CVulkanApp.cpp    
 )
 
-set_target_properties(vktriangle PROPERTIES OUTPUT_NAME ../bin/linux/vktriangle)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "MSYS")
     #
     # Windows
     #
+    SET(SYSTEM_NAME "windows")    
     target_link_libraries(vktriangle
+        vulkan-1
         glfw)
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     #
     # Linux
     #
+    SET(SYSTEM_NAME "linux")
+    set_target_properties(vktriangle PROPERTIES OUTPUT_NAME ../bin/linux/vktriangle)
     target_link_libraries(vktriangle
         vulkan
         glfw)
@@ -43,6 +53,8 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # Mac OS
     #
     # *TODO*
+    SET(SYSTEM_NAME "mac")
 endif()
 
 
+set_target_properties(vktriangle PROPERTIES OUTPUT_NAME ../bin/${SYSTEM_NAME}/vktriangle)    
