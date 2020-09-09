@@ -51,11 +51,12 @@ ifeq ($(OS_SYS),Darwin)
 
 TARGET_OS   = macos
 GLSLC       = glslc
+GLFW_PATH   = ../lib-extern/macos/glfw3
 FRAMEWORKS  = -framework IOKit \
-             -framework Foundation \
-             -framework Cocoa -framework CoreAudio -framework Carbon -framework AudioUnit
-CCFLAGS     = -O2 -std=gnu++17
-LDFLAGS = $(FRAMEWORKS) -L$(GLFW_PATH)/lib-macos -lvulkan -lglfw3
+              -framework Foundation \
+              -framework Cocoa -framework CoreAudio -framework Carbon -framework AudioUnit
+CCFLAGS     = -O2 -std=gnu++17 -I./source -I$(GLFW_PATH)/include
+LDFLAGS     = $(FRAMEWORKS) -L$(GLFW_PATH)/lib-macos -lvulkan -lglfw3
 
 endif
 
