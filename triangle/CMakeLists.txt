@@ -5,7 +5,8 @@ message("System: ${CMAKE_SYSTEM_NAME}")
 
 
 
-SET(VULKAN_SDK_WINDOWS "/opt/VulkanSDK/1.2.148.1")
+#SET(VULKAN_SDK_WINDOWS "/opt/VulkanSDK/1.2.148.1")
+SET(VULKAN_SDK_WINDOWS "/c/VulkanSDK/1.2.162.1")
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++17")
 
 
@@ -31,13 +32,13 @@ add_executable(vktriangle
 )
 
 
-if (CMAKE_SYSTEM_NAME STREQUAL "MSYS")
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     #
     # Windows
     #
     SET(SYSTEM_NAME "windows")    
     target_link_libraries(vktriangle
-        vulkan-1
+        vulkan
         glfw)
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     #

@@ -6,7 +6,8 @@
 #
 # Set the path to the Vulkan SDK here:
 
-VULKAN_SDK = /opt/VulkanSDK/1.2.141.2
+#VULKAN_SDK = /opt/VulkanSDK/1.2.141.2
+VULKAN_SDK = /c/VulkanSDK/1.2.162.1
 
 #**********************************************************************
 

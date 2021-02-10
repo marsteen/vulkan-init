@@ -27,13 +27,47 @@
 #include <set>
 #include <CVulkanApp.h>
 
+using namespace std;
 
+/*
 const std::vector<Vertex> vertices = 
 {
-    { {0.0f, -0.5f}, {1.0f, 0.0f, 0.0f} }, // 1. point: position, color
-    { {0.5f, 0.5f},  {0.0f, 1.0f, 0.0f} }, // 2. point: position, color
-    { {-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f} }  // 3. point: position, color
+    { { 0.0f, -0.5f }, { 1.0f, 0.0f, 0.0f } }, // 1. point: position, color
+    { { 0.5f,  0.5f }, { 0.0f, 1.0f, 0.0f } }, // 2. point: position, color
+    { { -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } }  // 3. point: position, color
 };
+*/
+
+
+const std::vector<Vertex> triangleVertices = 
+{
+    // 1. Dreieck
+    { { -0.5f, -0.5f }, { 0.0f, 0.2f, 1.0f } },  // 1. point: position, color
+    { {  0.5f, -0.5f }, { 0.0f, 0.4f, 1.0f } },  // 2. point: position, color
+    { {  0.5f,  0.5f }, { 0.0f, 0.6f, 1.0f } },  // 3. point: position, color    
+
+    // 2. Dreieck
+    { { -0.5f,  0.5f }, { 1.0f, 0.2f, 0.0f } },  // 3. point: position, color
+    { { -0.5f, -0.5f }, { 1.0f, 0.4f, 0.0f } },  // 1. point: position, color    
+    { {  0.5f,  0.5f }, { 1.0f, 0.6f, 0.0f } },  // 3. point: position, color    
+
+
+};
+
+const std::vector<Vertex> triangleVertices2 = 
+{
+    // 1. Dreieck
+    { { -0.5f, -0.5f }, { 0.0f, 0.2f, 0.0f } },  // 1. point: position, color
+    { {  0.5f, -0.5f }, { 0.0f, 0.4f, 0.0f } },  // 2. point: position, color
+    { {  0.5f,  0.5f }, { 0.0f, 0.6f, 0.0f } },  // 3. point: position, color    
+
+    // 2. Dreieck
+    { { -0.5f,  0.5f }, { 0.0f, 0.01f, 0.0f } },  // 3. point: position, color
+    { { -0.5f, -0.5f }, { 0.0f, 0.01f, 0.0f } },  // 1. point: position, color    
+    { {  0.5f,  0.5f }, { 0.0f, 0.01f, 0.0f } },  // 3. point: position, color
+};
+
+
 
 //---------------------------------------------------------------------------
 //
@@ -140,7 +174,7 @@ void CVulkanApp::initVulkan()
     std::cout << "  createFramebuffers ok" << std::endl;
     createCommandPool();
     std::cout << "  createCommandPool ok" << std::endl;
-    createVertexBuffer(m_device, m_physicalDevice, m_vertexBuffer, m_vertexBufferMemory, vertices);
+    createVertexBuffer(m_device, m_physicalDevice, m_vertexBuffer, m_vertexBufferMemory, triangleVertices2);
     std::cout << "  createVertexBuffer ok" << std::endl;
     createCommandBuffers();
     std::cout << "  createCommandBuffers ok" << std::endl;
@@ -929,6 +963,9 @@ void CVulkanApp::createCommandBuffers()
             throw std::runtime_error("failed to allocate command buffers!");
         }
 
+
+        cout << "m_commandBuffers=" << m_commandBuffers.size() << endl;
+
         for (size_t i = 0; i < m_commandBuffers.size(); i++)
         {
             VkCommandBufferBeginInfo beginInfo{};
@@ -958,7 +995,7 @@ void CVulkanApp::createCommandBuffers()
             VkDeviceSize offsets[] = {0};
             vkCmdBindVertexBuffers(m_commandBuffers[i], 0, 1, vertexBuffers, offsets);
 
-            vkCmdDraw(m_commandBuffers[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+            vkCmdDraw(m_commandBuffers[i], static_cast<uint32_t>(triangleVertices.size()), 1, 0, 0);
 
             vkCmdEndRenderPass(m_commandBuffers[i]);
 
