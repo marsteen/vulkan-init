@@ -1,0 +1,1 @@
+ldd ../bin/windows/vktriangle.exe  | awk '$3 ~ /^\/home\// { print $3 }' | xargs -i cp {} ../bin/windows/

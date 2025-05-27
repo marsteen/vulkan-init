@@ -20,7 +20,14 @@ if (GLFW3_FOUND)
     include_directories($(GLFW3_INCLUDE_DIRS))    
 endif()
 
+#
+# GLM
+#
+find_package(glm REQUIRED)
+include_directories(${GLM_INCLUDE_DIR})
+
 include_directories(./source)
+
 if (CMAKE_SYSTEM_NAME STREQUAL "MSYS")
     include_directories(./source ${VULKAN_SDK_WINDOWS}/include)
     link_directories(${VULKAN_SDK_WINDOWS}/Lib)
