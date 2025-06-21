@@ -5,10 +5,12 @@ Test project for Vulkan applications
 ## Building the triangle example:
 
 1. Install Vulkan SDK
-2. Install glfw3 packages (Windows, Linux)
-3. Set the path to the Vulkan SDK in the makefile (Windows)
-4. Open console, cd to folder "triangle"
-5. Make the project with "make"
+2. Install libglfw3-dev, libglm-dev packages
+3. Open console, cd to folder "triangle"
+4. Make directory "build"
+5. cd to "build"
+6. cmake ..
+7. make
 
 ### Prerequisites
 
