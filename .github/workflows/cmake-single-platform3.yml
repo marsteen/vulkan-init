@@ -22,8 +22,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Get Vulkan sdk 01
+      run: wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo tee /etc/apt/trusted.gpg.d/lunarg.asc
+    - name: Get Vulkan sdk 02
+      run: sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-noble.list http://packages.lunarg.com/vulkan/lunarg-vulkan-noble.list
     - name: Update APT
       run: sudo apt-get update
+    - name: Get Vulkan sdk 03   
+      run: sudo apt install vulkan-sdk
   
     - name: Install libraries Vulkan, GLFW3, glm
       run: sudo apt install -y libvulkan-dev libglfw3-dev libglm-dev
